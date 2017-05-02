@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+	
+	<!-- 线程执行器配置，用于任务注册 -->
+	<bean id="executor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="100" />
+		<property name="queueCapacity" value="500" />
+	</bean>
+
+	<!-- 业务对象 -->
+	<bean id="autoBatchTestJob" class="com.i5018.commons.quartz.MyBean" />
+   
+    <!-- job的配置开始 -->
+    <bean id="autoBatchTestJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="autoBatchTestJob" />
+        </property>
+        <property name="targetMethod">
+            <value>autoBatchTestTask</value>
+        </property>
+    </bean>
+
+	<!-- 定义simpleTrigger触发器 -->    
+    <!-- <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="autoBatchTestJobDetail"></property>
+        <property name="repeatCount">
+            <value>1</value>
+        </property>
+        <property name="repeatInterval">
+            <value>200</value>
+        </property>
+        <property name="startDelay">
+            <value>300</value>
+        </property>
+    </bean>  -->
+
+    <!-- 自动测试任务的配置 -->
+    <bean id="autoBatchTestTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="autoBatchTestJobDetail" />
+        </property>
+        <property name="cronExpression">
+            <value>*/10 * * * * ?</value>
+        </property>
+
+    </bean>
+    
+	<!-- 启动触发器的配置开始 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobDetails">
+			<list>
+				<ref bean="autoBatchTestJobDetail" />
+			</list>
+		</property>
+
+		<property name="triggers">
+			<list>
+				<ref bean="autoBatchTestTrigger" />
+			</list>
+		</property>
+		<property name="taskExecutor" ref="executor" /> 
+	</bean>
+
+</beans>
