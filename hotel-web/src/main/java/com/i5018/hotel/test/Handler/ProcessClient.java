@@ -15,7 +15,7 @@ public class ProcessClient {
      * 来生成html文件 
      * @param out 
      */  
-    public static void processBody(Writer out){  
+/*    public static void processBody(Writer out){  
         Header h = HeaderService.getHeader();  
         root.put("h", h);  
         Footer f = FooterService.gerFooter();  
@@ -23,5 +23,5 @@ public class ProcessClient {
         List<User> users = UserService.getUsers();  
         root.put("users", users);  
         FreeMarkertUtil.processTemplate("body.ftl", root, out);  
-    }  
+    }  */
 }
